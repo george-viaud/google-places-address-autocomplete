@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Autocomplete Example</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .form-container label,
+        .form-container input {
+            width: 300px;
+            margin: 5px 0;
+        }
+        .form-container label {
+            text-align: left;
+        }
+        .form-container input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <label for="address-full">Full Address:</label>
+        <input name="address-full" id="address-full" type="text">
+
+        <label for="street">Street:</label>
+        <input name="street" id="street" type="text">
+
+        <label for="city">City:</label>
+        <input name="city" id="city" type="text">
+
+        <label for="state">State:</label>
+        <input name="state" id="state" type="text">
+
+        <label for="zip">Zip Code:</label>
+        <input name="zip" id="zip" type="text">
+    </div>
+
+    <script>
+        function loadGoogleMapsScript(apiKey, callback) {
+            var script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=${callback}`;
+            script.async = true;
+            script.defer = true;
+            script.onerror = function() {
+                console.error('Failed to load Google Maps script');
+            };
+            document.head.appendChild(script);
+        }
+
+        function initAddressAutocomplete() {
+            console.log('initAddressAutocomplete function called');
+            var input = document.getElementById('address-full');
+            if (input) {
+                console.log('Autocomplete input element found');
+                var autocomplete = new google.maps.places.Autocomplete(input, { types: ['geocode'] });
+
+                autocomplete.addListener('place_changed', function() {
+                    var place = autocomplete.getPlace();
+                    console.log('Place changed:', place);
+
+                    var addressComponents = place.address_components;
+                    var street = '';
+                    var city = '';
+                    var state = '';
+                    var zip = '';
+
+                    addressComponents.forEach(function(component) {
+                        var types = component.types;
+                        if (types.includes('street_number')) {
+                            street = component.long_name + ' ' + street;
+                        }
+                        if (types.includes('route')) {
+                            street += component.long_name;
+                        }
+                        if (types.includes('locality')) {
+                            city = component.long_name;
+                        }
+                        if (types.includes('administrative_area_level_1')) {
+                            state = component.short_name;
+                        }
+                        if (types.includes('postal_code')) {
+                            zip = component.long_name;
+                        }
+                    });
+
+                    document.getElementById('street').value = street;
+                    document.getElementById('city').value = city;
+                    document.getElementById('state').value = state;
+                    document.getElementById('zip').value = zip;
+                });
+            } else {
+                console.error('Autocomplete input element not found');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded event fired');
+            var apiKey = 'YOUR-API-KEY-HERE';
+            loadGoogleMapsScript(apiKey, 'initAddressAutocomplete');
+        });
+    </script>
+
+</body>
+</html>
+
