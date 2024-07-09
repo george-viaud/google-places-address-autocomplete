@@ -1,4 +1,5 @@
-# Google Places API - Address Autocomplete using dynamic script loading example
+# Google Places API - Address Autocomplete Example
+## using dynamic script loading
 
 Just some boilerplate to add google places API address autocomplete to form inputs.
 
